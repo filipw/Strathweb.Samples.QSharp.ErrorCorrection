@@ -24,7 +24,7 @@
             CNOT(register[0], register[1]);
             CNOT(register[0], register[2]);
 
-            // simulate bit -flipping noise
+            // simulate bit-flipping noise
             let error = DrawRandomInt(0, 2);
             X(register[error]);
 
