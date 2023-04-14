@@ -42,14 +42,14 @@
         X(register[error]);
 
         // transfer syndrome to auxilliary
-        CNOT(register[1], auxilliary[0]);
         CNOT(register[0], auxilliary[1]);
+        CNOT(register[1], auxilliary[1]);
+        CNOT(register[1], auxilliary[0]);
         CNOT(register[2], auxilliary[0]);
-        CNOT(register[2], auxilliary[1]);
 
         // correct errors
         CNOT(auxilliary[1], register[0]);
-        CNOT(auxilliary[0], register[1]);
+        CNOT(auxilliary[0], register[2]);
         CCNOT(auxilliary[0], auxilliary[1], register[0]);
         CCNOT(auxilliary[0], auxilliary[1], register[1]);
         CCNOT(auxilliary[0], auxilliary[1], register[2]);
@@ -113,6 +113,4 @@
         Ry(2. * PI() / 3., q);
         Rz(3. * PI() / 4., q);
     }
-
-
 }
