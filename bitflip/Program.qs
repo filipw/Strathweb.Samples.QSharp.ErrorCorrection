@@ -1,4 +1,4 @@
-﻿namespace Strathweb.Samples.QSharp.BitFlipErrorCorrection {
+﻿namespace Strathweb.Samples.QSharp.ErrorCorrection {
 
     open Microsoft.Quantum.Convert;
     open Microsoft.Quantum.Diagnostics;
