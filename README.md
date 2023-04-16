@@ -1,1 +1,1 @@
-# Strathweb.Samples.QSharp.BitFlipErrorCorrection
+# Strathweb.Samples.QSharp.ErrorCorrection
