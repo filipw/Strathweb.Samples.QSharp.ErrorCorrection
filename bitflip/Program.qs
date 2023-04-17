@@ -1,5 +1,7 @@
 ﻿namespace Strathweb.Samples.QSharp.ErrorCorrection {
 
+    open Microsoft.Quantum.Arrays;
+    open Microsoft.Quantum.ErrorCorrection;
     open Microsoft.Quantum.Convert;
     open Microsoft.Quantum.Diagnostics;
     open Microsoft.Quantum.Random;
@@ -15,11 +17,13 @@
         mutable successCount1 = 0;
         mutable successCount2 = 0;
         mutable successCount3 = 0;
+        mutable successCount4 = 0;
 
         for i in 1..runs {
             set successCount1 += WithAuxAndManualMeasurement() ? 1 | 0;
             set successCount2 += WithAuxAndAutomaticCorrection() ? 1 | 0;
             set successCount3 += WithParityMeasurement() ? 1 | 0;
+            set successCount4 += WithFramework() ? 1 | 0;
         }
 
         Message("Auxiliary qubits and manual auxiliary register measurement: " 
@@ -28,6 +32,8 @@
                     + DoubleAsStringWithFormat(100. * IntAsDouble(successCount2) / IntAsDouble(runs), "N2") + " success rate");
         Message("No explicit auxiliary qubits with parity measurement: " 
                     + DoubleAsStringWithFormat(100. * IntAsDouble(successCount3) / IntAsDouble(runs), "N2") + " success rate");
+        Message("Framework based: " 
+                    + DoubleAsStringWithFormat(100. * IntAsDouble(successCount4) / IntAsDouble(runs), "N2") + " success rate");
     }
 
     operation Encode(register : Qubit[]) : Unit is Adj {
@@ -154,6 +160,34 @@
         Adjoint PrepareState(register[0]);
         let result = M(register[0]);
         let success = M(register[0]) == Zero;
+
+        ResetAll(register);
+        return success;
+    }
+
+    operation WithFramework() : Bool {
+        use register = Qubit[3];
+
+        // start with arbitrary state on 1st qubit
+        PrepareState(register[0]);
+
+        // encode it over three qubits
+        //Encode(register);
+        let logicalRegister = EncodeIntoBitFlipCode([register[0]], Rest(register));
+
+        // simulate bit-flipping noise
+        let error = DrawRandomInt(0, 2);
+        X(register[error]);
+
+        Recover(BitFlipCode(), BitFlipRecoveryFn(), logicalRegister);
+
+        // decode back
+        let (data, _) = DecodeFromBitFlipCode(logicalRegister);
+
+        // adjoint initial state to verify it went back to default
+        Adjoint PrepareState(data[0]);
+        let result = M(data[0]);
+        let success = M(data[0]) == Zero;
 
         ResetAll(register);
         return success;
