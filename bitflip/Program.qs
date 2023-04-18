@@ -52,8 +52,7 @@
         Encode(register);
 
         // simulate bit-flipping noise
-        let error = DrawRandomInt(0, 2);
-        X(register[error]);
+        SimulateError(register);
 
         // transfer syndrome to auxilliary
         CNOT(register[0], auxilliary[1]);
@@ -98,8 +97,7 @@
         Encode(register);
 
         // simulate bit-flipping noise
-        let error = DrawRandomInt(0, 2);
-        X(register[error]);
+        SimulateError(register);
 
         // transfer syndrome to auxilliary
         CNOT(register[0], auxilliary[1]);
@@ -136,8 +134,7 @@
         Encode(register);
 
         // simulate bit-flipping noise
-        let error = DrawRandomInt(0, 2);
-        X(register[error]);
+        SimulateError(register);
 
         // parity measurements Z₀Z₁ and Z₁Z₂
         let parityResult01 = ResultAsBool(Measure([PauliZ, PauliZ, PauliI], register));
@@ -176,8 +173,7 @@
         let logicalRegister = EncodeIntoBitFlipCode([register[0]], Rest(register));
 
         // simulate bit-flipping noise
-        let error = DrawRandomInt(0, 2);
-        X(register[error]);
+        SimulateError(register);
 
         Recover(BitFlipCode(), BitFlipRecoveryFn(), logicalRegister);
 
@@ -197,5 +193,10 @@
         Rx(1. * PI() / 2., q);
         Ry(2. * PI() / 3., q);
         Rz(3. * PI() / 4., q);
+    }
+
+    operation SimulateError(register : Qubit[]) : Unit {
+        let error = DrawRandomInt(0, 2);
+        X(register[error]);
     }
 }
