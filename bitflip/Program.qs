@@ -13,27 +13,26 @@
     @EntryPoint()
     operation Main() : Unit {
         
+        Execute("Auxiliary qubits and manual auxiliary register measurement", WithAuxAndManualMeasurement);
+        Execute("Auxiliary qubits with no measurement and automatic correction", WithAuxAndAutomaticCorrection);
+        Execute("No explicit auxiliary qubits with parity measurement", WithParityMeasurement);
+        Execute("Framework based error correction", WithFramework);
+    }
+
+    operation Execute(label : String, op : Unit => Bool) : Unit {
         let runs = 4096;
-        mutable successCount1 = 0;
-        mutable successCount2 = 0;
-        mutable successCount3 = 0;
-        mutable successCount4 = 0;
+        mutable successCount = 0;
 
         for i in 1..runs {
-            set successCount1 += WithAuxAndManualMeasurement() ? 1 | 0;
-            set successCount2 += WithAuxAndAutomaticCorrection() ? 1 | 0;
-            set successCount3 += WithParityMeasurement() ? 1 | 0;
-            set successCount4 += WithFramework() ? 1 | 0;
+            set successCount += op() ? 1 | 0;
         }
 
-        Message("Auxiliary qubits and manual auxiliary register measurement: " 
-                    + DoubleAsStringWithFormat(100. * IntAsDouble(successCount1) / IntAsDouble(runs), "N2") + " success rate");
-        Message("Auxiliary qubits with no measurement and automatic correction: " 
-                    + DoubleAsStringWithFormat(100. * IntAsDouble(successCount2) / IntAsDouble(runs), "N2") + " success rate");
-        Message("No explicit auxiliary qubits with parity measurement: " 
-                    + DoubleAsStringWithFormat(100. * IntAsDouble(successCount3) / IntAsDouble(runs), "N2") + " success rate");
-        Message("Framework based: " 
-                    + DoubleAsStringWithFormat(100. * IntAsDouble(successCount4) / IntAsDouble(runs), "N2") + " success rate");
+        Message("");
+        Message(label);
+        Message(DoubleAsStringWithFormat(100. * IntAsDouble(successCount) / IntAsDouble(runs), "N2") + " success rate");
+        Message("");
+        Message("***********");
+
     }
 
     operation Encode(register : Qubit[]) : Unit is Adj {
